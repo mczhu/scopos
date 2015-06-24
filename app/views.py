@@ -11,6 +11,7 @@ import pdb
 @app.route('/index')
 def index():
     jobDescription = request.args.get('jobDescription')
+    # TODO: instead of global variables, use flask session and define own JSON conversion
     global jobs
     jobs = Jobs()
 
@@ -35,7 +36,7 @@ def recommend():
 
     if jobDescription is None:
         jobsList = []
-        jobDescription = "data"
+        jobDescription = "data scientist"
         sim_score_sorted = ""
     else:
         # jobs = Jobs()
@@ -44,14 +45,16 @@ def recommend():
         sim_score_sorted = [sim_score[i] for i in simInd]
         jobsList = [jobs.getJob(ind) for ind in simInd]
         jobInd = simInd[0]
-
     return render_template("recommend.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
-    
+
 
 @app.route('/like')
 def like():
     global jobInd
     global rocchio
+    global jobs
+    # rocchio = request.args.get('like')
+    # pdb.set_trace()
     newQuery = rocchio.addToRelevant(jobInd)
     topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant())
     jobInd = topInd[0]
@@ -61,8 +64,17 @@ def like():
 def dislike():
     global jobInd
     global rocchio
+    global jobs
+    # rocchio = request.args.get('rocchio')
     newQuery = rocchio.addToIrrelevant(jobInd)
     topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant())
     jobInd = topInd[0]
     return render_template("dislike.html", topJob=jobs.getJob(jobInd))
+    
+@app.route('/viewliked')
+def viewliked():
+    global rocchio
+    global jobs
+    jobsList = [jobs.getJob(ind) for ind in rocchio.getRelevant()]
+    return render_template("viewliked.html", jobsList=jobsList)
     
