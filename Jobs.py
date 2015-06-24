@@ -80,18 +80,6 @@ class Jobs(object):
         Job.date = rows[0][8]
         return Job
         
-        
-    # def search(self, query="machine+learning", nJobs=25):
-    #     # Query for jobs in DB
-    #     with self._con:
-    #         cur = self._con.cursor()
-    #         sql = "SELECT `title`, `company` FROM Jobs WHERE `query` = %s"
-    #         cur.execute(sql, (query))
-    #         rows = cur.fetchall()
-    #     if not rows:
-    #         return None
-    #     Job = namedtuple('Job', ['jobkey', 'title', 'company', 'location', 'url', 'date', 'summary',  'query' ])
-
     def createDB(self):
         with self._con:
             cur = self._con.cursor()
