@@ -1,5 +1,6 @@
 from Jobs import Jobs
 import matplotlib.pyplot as plt
+import PrecisionRecall
 
 if __name__ == '__main__':
     # Test search
@@ -7,7 +8,9 @@ if __name__ == '__main__':
 
     with open("indeed_api_key") as f:
         indeedKey = f.read()
-    jobs.addToDB(indeedkey, "data+engineer",  nJobs=500)
+    jobs.addToDB(indeedKey, "housekeeper",  nJobs=10)
+    jobs._init_model(num_topics=50, isInitCorpus=True)
+
     # jobs.search()
 
     # TODO: check that the returned jobs are indeed close to the query by visualizing the scatter
@@ -18,7 +21,6 @@ if __name__ == '__main__':
 
     # Job = jobs.getJob(2)
     # # jobs.view_jobs(queryJobIdx)
-    # simInd, simVal = jobs.findSimilar(Job.summary)
     # # simInd, simVal = jobs.findSimilar(Job.summary, exclude=[2, 712])
     # # jobs.view_jobs(simInd[0])
     # # jobs.view_jobs(simInd[1])
@@ -39,3 +41,13 @@ if __name__ == '__main__':
         plt.axis("off")
         plt.show()
         plt.savefig('data_scientist.png', bbox_inches='tight', pad_inches=0)
+
+    isPR = True
+    if isPR:
+        simInd, simVal = jobs.findSimilar("housekeeper", top=10)
+        retrieved = [jobs.getJob(ind).query for ind in simInd]
+        relevant = "housekeeper"
+        pr = PrecisionRecall.PrecisionRecall(relevant, retrieved, 10)
+        pr.plot()
+        plt.savefig('pr.png')
+        
