@@ -5,7 +5,7 @@ class Rocchio(object):
     # Rocchio's algorithm for relevance feedback
     ALPHA = 1
     BETA = .75
-    GAMMA = .75
+    GAMMA = .5
 
     def __init__(self, vecRep, initQuery):
         # old_err_state = np.seterr(divide='raise')
