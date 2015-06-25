@@ -3,7 +3,7 @@ import pdb
 
 class Rocchio(object):
     # Rocchio's algorithm for relevance feedback
-    ALPHA = 0.2
+    ALPHA = 1
     BETA = .75
     GAMMA = .75
 
@@ -25,7 +25,7 @@ class Rocchio(object):
         if len(self._irrelevant) != 0:
             sumIrrel = self.GAMMA * np.sum(np.array([self._vecRep[ind] for ind in self._irrelevant]), axis=0) / len(self._irrelevant)
         # pdb.set_trace()
-        return self._initQuery + sumRel - sumIrrel
+        return self.ALPHA * self._initQuery + sumRel - sumIrrel
     
     def addToRelevant(self, jobInd):
         # Add the document to the "relevant" class
