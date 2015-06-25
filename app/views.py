@@ -29,7 +29,8 @@ def index():
 @app.route('/recommend')
 def recommend():
     jobDescription = request.args.get('jobDescription')
-    isRepeatCompany = request.args.get('repeat')
+    global checked
+    checked = request.args.get('checked')
     global rocchio
     global jobInd
     global jobs
@@ -41,6 +42,7 @@ def recommend():
         jobsList = []
         jobDescription = "data scientist"
         sim_score_sorted = ""
+        checked = "checked"
     else:
         # jobs = Jobs()
         rocchio = Rocchio(jobs.getVecRepMat(), jobs.getVecRep(jobDescription))
@@ -48,7 +50,7 @@ def recommend():
         sim_score_sorted = [sim_score[i] for i in simInd]
         jobsList = [jobs.getJob(ind) for ind in simInd]
         jobInd = simInd[0]
-    return render_template("recommend.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
+    return render_template("recommend.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted, checked = checked)
 
 @app.route('/like')
 def like():
@@ -57,7 +59,10 @@ def like():
     global jobs
     global sameCompany
     newQuery = rocchio.addToRelevant(jobInd)
-    sameCompany = sameCompany + jobs.findJobsInSameCompany(jobInd)
+    global checked
+    # checked = request.args.get('checked')
+    if checked:
+        sameCompany = sameCompany + jobs.findJobsInSameCompany(jobInd)
     topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+sameCompany)
     jobInd = topInd[0]
     return render_template("like.html", topJob=jobs.getJob(jobInd))
@@ -68,7 +73,8 @@ def dislike():
     global rocchio
     global jobs
     global sameCompany
-    # rocchio = request.args.get('rocchio')
+    global checked
+    # checked = request.args.get('checked')
     newQuery = rocchio.addToIrrelevant(jobInd)
     topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+sameCompany)
     jobInd = topInd[0]

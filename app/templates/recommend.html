@@ -66,9 +66,15 @@
             <textarea class="form-control" rows="1" name="jobDescription" placeholder="Enter a job description">{{jobDescription}}</textarea>
           </div>
           <div class="checkbox" >
+            {% if checked %}
             <label>
-              <input type="checkbox" checked="checked" name="repeat" value="repeat"> Do not repeat jobs from the same company
+              <input type="checkbox" checked="checked" name="checked" value="checked"> Do not repeat jobs from the same company
             </label>
+            {% else %}
+            <label>
+              <input type="checkbox" name="checked" value="checked"> Do not repeat jobs from the same company
+            </label>
+            {% endif %}
           </div>
           <div>
             <!-- <input type="submit" name="submit" value="Submit"> -->
@@ -86,7 +92,7 @@
           {% if jobsList %}
           <div class="panel panel-primary">
             <div class="panel-heading">{{jobsList[0].title}}, {{jobsList[0].company}}</div>
-            <div class="panel-body" style="max-height: 400px; overflow-y: scroll;">{{jobsList[0].html|safe}}</div>
+            <div class="panel-body" style="max-height: 300px; overflow-y: scroll;">{{jobsList[0].html|safe}}</div>
           </div>
         </div>
           <div class="col-md-1">
