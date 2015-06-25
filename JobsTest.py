@@ -6,10 +6,10 @@ if __name__ == '__main__':
     # Test search
     jobs = Jobs()
 
-    with open("indeed_api_key") as f:
-        indeedKey = f.read()
-    jobs.addToDB(indeedKey, "housekeeper",  nJobs=10)
-    jobs._init_model(num_topics=50, isInitCorpus=True)
+    # with open("indeed_api_key") as f:
+    #     indeedKey = f.read()
+    # jobs.addToDB(indeedKey, "data+scientist",  nJobs=100)
+    # jobs._init_model(num_topics=50, isInitCorpus=True)
 
     # jobs.search()
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         plt.show()
         plt.savefig('data_scientist.png', bbox_inches='tight', pad_inches=0)
 
-    isPR = True
+    isPR = False
     if isPR:
         simInd, simVal = jobs.findSimilar("housekeeper", top=10)
         retrieved = [jobs.getJob(ind).query for ind in simInd]
