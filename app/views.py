@@ -11,24 +11,6 @@ import pdb
 @app.route('/index')
 def index():
     jobDescription = request.args.get('jobDescription')
-    # TODO: instead of global variables, use flask session and define own JSON conversion
-    global jobs
-    jobs = Jobs()
-
-    if jobDescription is None:
-        jobsList = []
-        jobDescription = ""
-        sim_score_sorted = ""
-    else:
-        simInd, sim_score = jobs.findSimilar(jobDescription)
-        sim_score_sorted = [sim_score[i] for i in simInd]
-        jobsList = [jobs.getJob(ind) for ind in simInd]
-    return render_template("index.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
-
-
-@app.route('/recommend')
-def recommend():
-    jobDescription = request.args.get('jobDescription')
     global checked
     checked = request.args.get('checked')
     global rocchio
@@ -50,7 +32,25 @@ def recommend():
         sim_score_sorted = [sim_score[i] for i in simInd]
         jobsList = [jobs.getJob(ind) for ind in simInd]
         jobInd = simInd[0]
-    return render_template("recommend.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted, checked = checked)
+    return render_template("index.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted, checked = checked)
+
+@app.route('/search')
+def search():
+    jobDescription = request.args.get('jobDescription')
+    # TODO: instead of global variables, use flask session and define own JSON conversion
+    global jobs
+    jobs = Jobs()
+
+    if jobDescription is None:
+        jobsList = []
+        jobDescription = ""
+        sim_score_sorted = ""
+    else:
+        simInd, sim_score = jobs.findSimilar(jobDescription)
+        sim_score_sorted = [sim_score[i] for i in simInd]
+        jobsList = [jobs.getJob(ind) for ind in simInd]
+    return render_template("search.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
+
 
 @app.route('/like')
 def like():
