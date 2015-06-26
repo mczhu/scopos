@@ -64,6 +64,7 @@ class Jobs(object):
         with self._con:
             cur = self._con.cursor()
             sql = "SELECT * FROM Jobs WHERE `jobkey` = %s"
+            # sql = "SELECT * FROM SE WHERE `jobkey` = %s"            
             cur.execute(sql, (self._index[index]))
             rows = cur.fetchall()
         if not rows:
@@ -80,24 +81,20 @@ class Jobs(object):
         Job.date = rows[0][8]
         return Job
         
-        
-    # def search(self, query="machine+learning", nJobs=25):
-    #     # Query for jobs in DB
-    #     with self._con:
-    #         cur = self._con.cursor()
-    #         sql = "SELECT `title`, `company` FROM Jobs WHERE `query` = %s"
-    #         cur.execute(sql, (query))
-    #         rows = cur.fetchall()
-    #     if not rows:
-    #         return None
-    #     Job = namedtuple('Job', ['jobkey', 'title', 'company', 'location', 'url', 'date', 'summary',  'query' ])
-
     def createDB(self):
         with self._con:
             cur = self._con.cursor()
-            sql = "CREATE TABLE Jobs(title VARCHAR(50), company VARCHAR(50), location VARCHAR(50), url VARCHAR(2083), query VARCHAR(50), summary TEXT, jobkey VARCHAR(16), date TIMESTAMP, PRIMARY KEY (jobkey)) CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+            sql = "CREATE TABLE Jobs(title VARCHAR(50), company VARCHAR(50), location VARCHAR(50), url VARCHAR(2083), query VARCHAR(50), summary TEXT, html TEXT, jobkey VARCHAR(16), date TIMESTAMP, PRIMARY KEY (jobkey)) CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
             cur.execute(sql)
-    
+
+    # def _addDBIntInd(self):
+    #     # Add integer index to the database
+    #     with self._con:
+    #         cur = self._con.cursor()
+    #         for ind in range(len(self._index)):
+    #             sql = "INSERT INTO Jobs (`ind`) VALUES (%s)"
+    #             cur.execute(sql, (ind))
+
     def addToDB(self, publisher_key, query="machine+learning", location="New+York%2C+NY", nJobs=25):
         for queryIdx in range((nJobs-1)/Jobs.MAX_JOBS_PER_QUERY+1):
             response = unirest.get("https://indeed-indeed.p.mashape.com/apisearch?publisher={}&callback=<required>&chnl=<required>&co=<required>&filter=1&format=json&fromage=<required>&highlight=<required>&jt=<required>&l={}&latlong=<required>&limit={}&q={}&radius=25&sort=<required>&st=<required>&start={}&useragent=<required>&userip=<required>&v=2".format(publisher_key, location, Jobs.MAX_JOBS_PER_QUERY, query, queryIdx*Jobs.MAX_JOBS_PER_QUERY),
@@ -123,16 +120,20 @@ class Jobs(object):
                 with self._con:
                     cur = self._con.cursor()
                     sql = "INSERT IGNORE INTO `Jobs` (`jobkey`, `title`, `company`, `location`, `url`, `date`, `summary`, `html`, `query`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                    # sql = "INSERT IGNORE INTO `SE` (`jobkey`, `title`, `company`, `location`, `url`, `date`, `summary`, `html`, `query`) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
                     cur.execute(sql, (result['jobkey'], result['jobtitle'], result['company'], result['formattedLocation'], result['url'], date.strftime("%Y-%m-%d %H:%M:%S"), jobSummary.get_text(" "), unicode(str(jobSummary), "utf-8"), query))
+
+        self._update_index()
 
             # # TODO: Sequentially update the model
             # self._init_model(num_topics=5, isInitCorpus=True)
 
     def genWordCloud(self, query="data+scientist"):
-        
         with self._con:
             cur = self._con.cursor()
             sql = "SELECT `summary` FROM Jobs WHERE query=%s"
+            # sql = "SELECT `summary` FROM SE WHERE query=%s"
             cur.execute(sql, (query))
             rows = cur.fetchall()
         # pdb.set_trace()
@@ -258,6 +259,17 @@ class Jobs(object):
     def findSimilar(self, jobDescription, top=10, exclude=[]):
         topInd, sim_index = self._findSimilarFromVec(self._getVecRep(jobDescription), top=top, exclude=exclude)
         return topInd, sim_index
+
+    def findJobsInSameCompany(self, ind):
+        # return the index of jobs from the same company
+        with self._con:
+            cur = self._con.cursor()
+            sql = "SELECT `jobkey` from Jobs WHERE `company` = %s"
+            cur.execute(sql, (self.getJob(ind).company))
+            rows = cur.fetchall()
+            indSameCompany = [self._index.index(row[0]) for row in rows]
+            indSameCompany.remove(ind)
+            return indSameCompany
         
     def print_topics(self, num_topics=5):
         # if self._corpus_lsi is None:

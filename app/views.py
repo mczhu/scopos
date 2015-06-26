@@ -11,6 +11,33 @@ import pdb
 @app.route('/index')
 def index():
     jobDescription = request.args.get('jobDescription')
+    global checked
+    checked = request.args.get('checked')
+    global rocchio
+    global jobInd
+    global jobs
+    jobs = Jobs()
+    global sameCompany
+    sameCompany = []
+
+    if jobDescription is None:
+        jobsList = []
+        jobDescription = "data scientist"
+        sim_score_sorted = ""
+        checked = "checked"
+    else:
+        # jobs = Jobs()
+        rocchio = Rocchio(jobs.getVecRepMat(), jobs.getVecRep(jobDescription))
+        simInd, sim_score = jobs.findSimilar(jobDescription)
+        sim_score_sorted = [sim_score[i] for i in simInd]
+        jobsList = [jobs.getJob(ind) for ind in simInd]
+        jobInd = simInd[0]
+    return render_template("index.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted, checked = checked)
+
+@app.route('/search')
+def search():
+    jobDescription = request.args.get('jobDescription')
+    # TODO: instead of global variables, use flask session and define own JSON conversion
     global jobs
     jobs = Jobs()
 
@@ -22,38 +49,21 @@ def index():
         simInd, sim_score = jobs.findSimilar(jobDescription)
         sim_score_sorted = [sim_score[i] for i in simInd]
         jobsList = [jobs.getJob(ind) for ind in simInd]
-    return render_template("index.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
+    return render_template("search.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
 
-
-@app.route('/recommend')
-def recommend():
-    jobDescription = request.args.get('jobDescription')
-    global rocchio
-    global jobInd
-    global jobs
-    jobs = Jobs()
-
-    if jobDescription is None:
-        jobsList = []
-        jobDescription = "data"
-        sim_score_sorted = ""
-    else:
-        # jobs = Jobs()
-        rocchio = Rocchio(jobs.getVecRepMat(), jobs.getVecRep(jobDescription))
-        simInd, sim_score = jobs.findSimilar(jobDescription)
-        sim_score_sorted = [sim_score[i] for i in simInd]
-        jobsList = [jobs.getJob(ind) for ind in simInd]
-        jobInd = simInd[0]
-
-    return render_template("recommend.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted)
-    
 
 @app.route('/like')
 def like():
     global jobInd
     global rocchio
+    global jobs
+    global sameCompany
     newQuery = rocchio.addToRelevant(jobInd)
-    topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant())
+    global checked
+    # checked = request.args.get('checked')
+    if checked:
+        sameCompany = sameCompany + jobs.findJobsInSameCompany(jobInd)
+    topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+sameCompany)
     jobInd = topInd[0]
     return render_template("like.html", topJob=jobs.getJob(jobInd))
 
@@ -61,8 +71,19 @@ def like():
 def dislike():
     global jobInd
     global rocchio
+    global jobs
+    global sameCompany
+    global checked
+    # checked = request.args.get('checked')
     newQuery = rocchio.addToIrrelevant(jobInd)
-    topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant())
+    topInd, simVal = jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+sameCompany)
     jobInd = topInd[0]
     return render_template("dislike.html", topJob=jobs.getJob(jobInd))
+    
+@app.route('/viewliked')
+def viewliked():
+    global rocchio
+    global jobs
+    jobsList = [jobs.getJob(ind) for ind in rocchio.getRelevant()]
+    return render_template("viewliked.html", jobsList=jobsList)
     
