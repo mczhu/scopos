@@ -211,7 +211,7 @@ class Jobs(object):
                         
     def _update_model(self, query):
         # Query for jobs in DB
-        if self._lda is None or self._tfidf is None or self._simIndex is None or self._dictionary is None:
+        if self._lsi is None or self._tfidf is None or self._simIndex is None or self._dictionary is None:
             self._init_model()
         else:
             self._update_index()
@@ -306,7 +306,7 @@ class Jobs(object):
         return np.array([[vecRepEntry[1] for vecRepEntry in vecRep] for vecRep in self._vecRep])
 
     def _getVecRep(self, jobDescription):
-        if self._lda is None or self._tfidf is None or self._simIndex is None or self._dictionary is None:        
+        if self._lsi is None or self._tfidf is None or self._simIndex is None or self._dictionary is None:        
             self._init_model()
         text = [self.stemmer.stem(w.lower()) for w in word_tokenize(jobDescription) if (w.isalpha() and (w not in self.STOPLIST))]
         vec_bow = self._dictionary.doc2bow(text)
