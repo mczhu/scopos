@@ -95,11 +95,11 @@ class Jobs(object):
     #             sql = "INSERT INTO Jobs (`ind`) VALUES (%s)"
     #             cur.execute(sql, (ind))
 
-    def addToDB(self, publisher_key, query="machine+learning", location="New+York%2C+NY", nJobs=25):
+    def addToDB(self, publisher_key, mashapeKey, query="machine+learning", location="New+York%2C+NY", nJobs=25):
         for queryIdx in range((nJobs-1)/Jobs.MAX_JOBS_PER_QUERY+1):
             response = unirest.get("https://indeed-indeed.p.mashape.com/apisearch?publisher={}&callback=<required>&chnl=<required>&co=<required>&filter=1&format=json&fromage=<required>&highlight=<required>&jt=<required>&l={}&latlong=<required>&limit={}&q={}&radius=25&sort=<required>&st=<required>&start={}&useragent=<required>&userip=<required>&v=2".format(publisher_key, location, Jobs.MAX_JOBS_PER_QUERY, query, queryIdx*Jobs.MAX_JOBS_PER_QUERY),
       headers={
-        "X-Mashape-Key": "dXuBqlLE3LmshDHVmmi6n4qBOiQop1gnU8mjsnKTy2kHthaQnV",
+        "X-Mashape-Key": mashapeKey,
         "Accept": "application/json"
       }
     )

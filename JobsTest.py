@@ -6,9 +6,11 @@ if __name__ == '__main__':
     # Test search
     jobs = Jobs()
 
-    # with open("indeed_api_key") as f:
-    #     indeedKey = f.read()
-    # jobs.addToDB(indeedKey, "data+scientist",  nJobs=100)
+    with open("indeed_api_key") as f:
+        lines = f.read().splitlines() 
+    indeedKey = lines[0]
+    mashapeKey = lines[1]
+    jobs.addToDB(indeedKey, mashapeKey, "data+scientist",  nJobs=10)
     # jobs._init_model(num_topics=50, isInitCorpus=True)
 
     # jobs.search()
