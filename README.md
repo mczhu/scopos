@@ -6,7 +6,7 @@ A personalized job search tool.
 
 This is my Insight Data Science project.
 
-## Prepare your own job posting database
+## Prepare your own job postings database
 
 Currently the job database used by http://scopos.link only includes data scientist/engineer jobs in New York. To prepare your own job database:
 
