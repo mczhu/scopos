@@ -19,4 +19,3 @@ http://www.indeed.com/publisher
 https://www.mashape.com/indeed/indeed
 
 3. Follow JobsTest.py to add jobs to the database
-

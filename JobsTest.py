@@ -14,9 +14,11 @@ if __name__ == '__main__':
         mashapeKey = lines[1]
         jobs.addToDB(indeedKey, mashapeKey, "data+scientist",  nJobs=10)
 
-    # jobs._init_model(num_topics=50, isInitCorpus=True)
+    isInitModel = True
+    if isInitModel:
+        jobs._init_model(num_topics=50, isInitCorpus=True)
 
-    isTestSimilarity = True
+    isTestSimilarity = False
     if isTestSimilarity:
         queryJobIdx = 2
         Job = jobs.getJob(queryJobIdx)
