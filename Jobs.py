@@ -146,6 +146,8 @@ class Jobs(object):
         
         corpus = [self._dictionary.doc2bow(text) for text in texts]
 
+        pdb.set_trace()
+
         # Transformation
         self._tfidf = models.TfidfModel(corpus)
         self._tfidf.save('transform.tfidf')
