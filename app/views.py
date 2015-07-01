@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, session
 from app import app
 import pymysql as mdb
 from Rocchio import Rocchio
@@ -10,8 +10,8 @@ import pdb
 @app.route('/index')
 def index():
     jobDescription = request.args.get('jobDescription')
-    global checked
-    checked = request.args.get('checked')
+    # global checked
+    session['checked'] = request.args.get('checked')
     global rocchio
     global jobInd
     global sameCompany
@@ -21,7 +21,7 @@ def index():
         jobsList = []
         jobDescription = "data scientist"
         sim_score_sorted = ""
-        checked = "checked"
+        session['checked'] = "checked"
     else:
         # jobs = Jobs()
         rocchio = Rocchio(app.jobs.getVecRepMat(), app.jobs.getVecRep(jobDescription))
@@ -29,7 +29,7 @@ def index():
         sim_score_sorted = [sim_score[i] for i in simInd]
         jobsList = [app.jobs.getJob(ind) for ind in simInd]
         jobInd = simInd[0]
-    return render_template("index.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted, checked = checked)
+    return render_template("index.html", jobsList = jobsList, jobDescription = jobDescription, sim_score = sim_score_sorted, checked = session['checked'])
 
 @app.route('/search')
 def search():
@@ -51,12 +51,11 @@ def search():
 def like():
     global jobInd
     global rocchio
-    # global jobs
     global sameCompany
     newQuery = rocchio.addToRelevant(jobInd)
-    global checked
+    # global checked
     # checked = request.args.get('checked')
-    if checked:
+    if session['checked']:
         sameCompany = sameCompany + app.jobs.findJobsInSameCompany(jobInd)
     topInd, simVal = app.jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+sameCompany)
     jobInd = topInd[0]
@@ -66,9 +65,8 @@ def like():
 def dislike():
     global jobInd
     global rocchio
-    # global jobs
     global sameCompany
-    global checked
+    # global checked
     # checked = request.args.get('checked')
     newQuery = rocchio.addToIrrelevant(jobInd)
     topInd, simVal = app.jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+sameCompany)
@@ -78,7 +76,6 @@ def dislike():
 @app.route('/viewliked')
 def viewliked():
     global rocchio
-    # global jobs
     jobsList = [app.jobs.getJob(ind) for ind in rocchio.getRelevant()]
     return render_template("viewliked.html", jobsList=jobsList)
     
