@@ -1,9 +1,21 @@
 from flask import Flask
-# SECRET_KEY = 'development key mczhu'
-# DEBUG = True
+from Jobs import Jobs
 
-app = Flask(__name__)
-app.config['DEBUG'] = False
+with open("flask_key") as f:
+    lines = f.read().splitlines() 
+    flask_key = lines[0]
+
+class MyServer(Flask):
+
+    def __init__(self, *args, **kwargs):
+            super(MyServer, self).__init__(*args, **kwargs)
+
+            self.jobs = Jobs()
+
+app = MyServer(__name__)
+app.secret_key = flask_key
+
+# app = Flask(__name__)
 # app.config.from_object(__name__)
 
 from app import views

@@ -7,15 +7,12 @@ class Rocchio(object):
     BETA = .75
     GAMMA = .5
 
-    def __init__(self, vecRep, initQuery):
+    def __init__(self, vecRep, initQuery, relevant=[], irrelevant=[]):
         # old_err_state = np.seterr(divide='raise')
         self._vecRep = vecRep
         self._initQuery = initQuery
-        # self._vecRep = np.divide(vecRep.T, np.linalg.norm(vecRep, axis=1)).T
-        # self._initQuery = np.divide(initQuery, np.linalg.norm(initQuery, axis=0))
-        self._relevant = []
-        self._irrelevant = []
-        # self._currentQuery = None
+        self._relevant = relevant
+        self._irrelevant = irrelevant
 
     def _getNewQuery(self):
         sumRel = 0

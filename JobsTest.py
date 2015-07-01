@@ -6,27 +6,23 @@ if __name__ == '__main__':
     # Test search
     jobs = Jobs()
 
-    # jobs._init_model(num_topics=50, isInitCorpus=True)
+    isAddJobs = False
+    if isAddJobs:
+        with open("indeed_api_key") as f:
+            lines = f.read().splitlines() 
+        indeedKey = lines[0]
+        mashapeKey = lines[1]
+        jobs.addToDB(indeedKey, mashapeKey, "data+scientist",  nJobs=10)
 
-    # with open("indeed_api_key") as f:
-    #     indeedKey = f.read()
-    # jobs.addToDB(indeedKey, "data+scientist",  nJobs=100)
-    # jobs._init_model(num_topics=50, isInitCorpus=True)
+    isInitModel = False
+    if isInitModel:
+        jobs._init_model(num_topics=50, isInitCorpus=True)
 
-    # jobs.search()
-
-    # TODO: check that the returned jobs are indeed close to the query by visualizing the scatter
-
-    # jobs.view_topics_scatter()
-
-    # jobs.print_topics()
-
-    # Job = jobs.getJob(2)
-    # # jobs.view_jobs(queryJobIdx)
-    # # simInd, simVal = jobs.findSimilar(Job.summary, exclude=[2, 712])
-    # # jobs.view_jobs(simInd[0])
-    # # jobs.view_jobs(simInd[1])
-    # # jobs.view_jobs(simInd[2])
+    isTestSimilarity = False
+    if isTestSimilarity:
+        queryJobIdx = 2
+        Job = jobs.getJob(queryJobIdx)
+        simInd, simVal = jobs.findSimilar(Job.summary)
 
     # topInd2, sim_index2 = jobs.findSimilarFromVec(jobs.getVecRep(Job.summary))
 
