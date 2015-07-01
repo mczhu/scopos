@@ -6,6 +6,8 @@ if __name__ == '__main__':
     # Test search
     jobs = Jobs()
 
+    # jobs._init_model(num_topics=50, isInitCorpus=True)
+
     # with open("indeed_api_key") as f:
     #     indeedKey = f.read()
     # jobs.addToDB(indeedKey, "data+scientist",  nJobs=100)
