@@ -59,6 +59,8 @@ def dislike():
     session['irrelevant'] = session['irrelevant'] + [session['jobInd']]
     rocchio = Rocchio(app.jobs.getVecRepMat(), app.jobs.getVecRep(session['jobDescription']), session['relevant'], session['irrelevant'])
     newQuery = rocchio.addToIrrelevant(session['jobInd'])
+    if session['checked']:
+        session['sameCompany'] = session['sameCompany'] + app.jobs.findJobsInSameCompany(session['jobInd'])
     topInd, simVal = app.jobs.findSimilarFromVec(newQuery, top=1, exclude=rocchio.getRelevant()+rocchio.getIrrelevant()+session['sameCompany'])
     session['jobInd'] = topInd[0]
     return render_template("dislike.html", topJob=app.jobs.getJob(session['jobInd']))

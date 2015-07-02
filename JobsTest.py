@@ -6,15 +6,15 @@ if __name__ == '__main__':
     # Test search
     jobs = Jobs()
 
-    isAddJobs = False
+    isAddJobs = True
     if isAddJobs:
         with open("indeed_api_key") as f:
             lines = f.read().splitlines() 
         indeedKey = lines[0]
         mashapeKey = lines[1]
-        jobs.addToDB(indeedKey, mashapeKey, "data+scientist",  nJobs=10)
+        jobs.addToDB(indeedKey, mashapeKey, "quantitative+developer",  nJobs=200)
 
-    isInitModel = False
+    isInitModel = True
     if isInitModel:
         jobs._init_model(num_topics=50, isInitCorpus=True)
 
