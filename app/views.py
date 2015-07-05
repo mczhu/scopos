@@ -21,6 +21,7 @@ def index():
         sim_score_sorted = ""
         session['checked'] = "checked"
     else:
+        # rocchio = None
         rocchio = Rocchio(app.jobs.getVecRepMat(), app.jobs.getVecRep(session['jobDescription']))
         simInd, sim_score = app.jobs.findSimilar(session['jobDescription'])
         sim_score_sorted = [sim_score[i] for i in simInd]
@@ -70,3 +71,6 @@ def viewliked():
     jobsList = [app.jobs.getJob(ind) for ind in session['relevant']]
     return render_template("viewliked.html", jobsList=jobsList)
     
+@app.errorhandler(500)
+def internal_error(error):
+    return "Sorry, Scopos is down. The administrator has been notified."
