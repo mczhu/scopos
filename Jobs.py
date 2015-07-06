@@ -228,6 +228,9 @@ class Jobs(object):
         vec_lsi = self._getVecRep(jobDescription)
         return np.array([vecRep[1] for vecRep in self._getVecRep(jobDescription)])
 
+    def connect(self, dbUsr = 'mengchen', dbPsw = '', dbName = 'indeed'):
+        self._con = mdb.connect('localhost', dbUsr, dbPsw, dbName, charset='utf8')
+
     # def _view_topics_scatter(self):
     #     #  obsolete
     #     if self._corpus_lsi is None:

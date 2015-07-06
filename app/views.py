@@ -9,6 +9,8 @@ import pdb
 @app.route('/')
 @app.route('/index')
 def index():
+    app.jobs.connect(dbUsr = 'mengchen', dbPsw = '', dbName = 'indeed')
+    
     session['jobDescription'] = request.args.get('jobDescription')
     session['checked'] = request.args.get('checked')
     session['sameCompany'] = []
@@ -31,6 +33,7 @@ def index():
 
 @app.route('/search')
 def search():
+    app.jobs.connect(dbUsr = 'mengchen', dbPsw = '', dbName = 'indeed')
     session['jobDescription'] = request.args.get('jobDescription')
 
     if session['jobDescription'] is None:

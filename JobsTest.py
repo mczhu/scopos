@@ -12,7 +12,7 @@ if __name__ == '__main__':
             lines = f.read().splitlines() 
         indeedKey = lines[0]
         mashapeKey = lines[1]
-        jobs.addToDB(indeedKey, mashapeKey, "quantitative+developer",  nJobs=200)
+        jobs.addToDB(indeedKey, mashapeKey, "data+scientist",  nJobs=200)
 
     isInitModel = True
     if isInitModel:
