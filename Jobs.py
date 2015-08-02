@@ -97,7 +97,6 @@ class Jobs(object):
 
                 date = datetime.strptime(result['date'], '%a, %d %b %Y %H:%M:%S GMT')
 
-                # TODO: insert attributes into SQL if jobkey not there
                 jobSummary = soup.find_all(class_="summary")[0]
                 with self._con:
                     cur = self._con.cursor()
@@ -125,9 +124,30 @@ class Jobs(object):
 
         wordcloud = WordCloud().generate(texts)
         return wordcloud
-        
-            
-    def _prepare_corpus(self):
+
+    def removeExpired(self, indeedKey, mashapeKey):
+        with self._con:
+            cur = self._con.cursor()
+            cur.execute("SELECT jobkey FROM Jobs")
+            for row in cur:
+                # Get the expired status
+                response = unirest.get("https://indeed-indeed.p.mashape.com/apigetjobs?publisher={}&format=json&jobkeys={}&v=2".format(indeedKey, row[0]),  headers={
+    "X-Mashape-Key": mashapeKey,
+    "Accept": "application/json"
+  }
+)
+                if (response.body["results"]):
+                    if (not response.body["results"][0]["expired"]):
+                        continue
+
+                print ("Processing Job " + row[0])
+                sql = "INSERT IGNORE OldJobs SELECT * FROM Jobs WHERE `jobkey`=%s"
+                cur2 = self._con.cursor()
+                cur2.execute(sql, row[0])
+                sql = "DELETE IGNORE FROM Jobs WHERE  `jobkey`=%s"
+                cur2.execute(sql, row[0])
+
+    def _import_text(self):
         with self._con:
             cur = self._con.cursor()
             cur.execute("SELECT `summary` FROM Jobs")
@@ -135,11 +155,17 @@ class Jobs(object):
         
         texts = [[w.lower() for w in word_tokenize(row[0]) if (w.isalpha() and (w not in self.STOPLIST))] for row in rows]
 
+
         # remove words that appear only once
         all_tokens = sum(texts, [])
         tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
         texts = [[self.stemmer.stem(word) for word in text if word not in tokens_once] for text in texts]
 
+        return texts
+                
+    def _prepare_corpus(self):
+        texts = self._import_text()
+        
         # Convert into BOW
         self._dictionary = corpora.Dictionary(texts)
         self._dictionary.save('jobs.dict')
