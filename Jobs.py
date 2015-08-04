@@ -150,16 +150,31 @@ class Jobs(object):
     def _import_text(self):
         with self._con:
             cur = self._con.cursor()
-            cur.execute("SELECT `summary` FROM Jobs")
-            rows = cur.fetchall()
+            cur.execute("SELECT `title`, `summary` FROM Jobs")
+            texts = []
+            for row in cur:
+                lowerText = []
+                for w in word_tokenize(row[0] + ' ' + row[1]):
+                    if (w.isalpha()):
+                        lowerW = w.lower()
+                        if (lowerW not in self.STOPLIST):
+                            lowerText.append(lowerW)
+                texts.append(lowerText)
+                
+        #     rows = cur.fetchall()
         
-        texts = [[w.lower() for w in word_tokenize(row[0]) if (w.isalpha() and (w not in self.STOPLIST))] for row in rows]
+        # texts = [[w.lower() for w in word_tokenize(row[0]) if (w.isalpha() and (w not in self.STOPLIST))] for row in rows]
 
 
         # remove words that appear only once
         all_tokens = sum(texts, [])
         tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
         texts = [[self.stemmer.stem(word) for word in text if word not in tokens_once] for text in texts]
+
+        # bigram = models.phrases.Phrases(texts)
+        # bigramTexts = list(bigram[texts])
+
+        # return bigramTexts, bigram
 
         return texts
                 
@@ -186,6 +201,14 @@ class Jobs(object):
         with open('vec.rep','w') as f:
             pickle.dump(self._vecRep, f)
 
+    # def _init_lda(self, num_topics=2):
+    #     self._lda =  models.LdaModel(self._corpus_tfidf, id2word=self._dictionary, num_topics=num_topics)
+    #     self._lda.save('model.lda')
+
+    #     self._vecRep = [vecRep for vecRep in self._lda[self._corpus_tfidf]]
+    #     with open('vec.rep','w') as f:
+    #         pickle.dump(self._vecRep, f)
+            
 
     def _init_model(self, num_topics=5, isInitCorpus=False):
         if isInitCorpus:
