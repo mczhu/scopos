@@ -2,9 +2,7 @@ from flask import render_template, request, session
 from app import app
 import pymysql as mdb
 from Rocchio import Rocchio
-
-import sys
-import pdb
+# import pdb
 
 @app.route('/')
 @app.route('/index')
@@ -17,19 +15,21 @@ def index():
     session['relevant'] = []
     session['irrelevant'] = []
 
+    isSearchHit = True
+    
     if session['jobDescription'] is None:
         jobsList = []
         session['jobDescription'] = "data scientist"
         sim_score_sorted = ""
         session['checked'] = "checked"
     else:
-        # rocchio = None
-        rocchio = Rocchio(app.jobs.getVecRepMat(), app.jobs.getVecRep(session['jobDescription']))
+        if (len(app.jobs.getVecRep(session['jobDescription'])) == 0):
+            isSearchHit = False
         simInd, sim_score = app.jobs.findSimilar(session['jobDescription'])
         sim_score_sorted = [sim_score[i] for i in simInd]
         jobsList = [app.jobs.getJob(ind) for ind in simInd]
         session['jobInd'] = simInd[0]
-    return render_template("index.html", jobsList = jobsList, jobDescription = session['jobDescription'], sim_score = sim_score_sorted, checked = session['checked'])
+    return render_template("index.html", jobsList = jobsList, jobDescription = session['jobDescription'], sim_score = sim_score_sorted, checked = session['checked'], isSearchHit = isSearchHit)
 
 @app.route('/search')
 def search():

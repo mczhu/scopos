@@ -89,7 +89,9 @@
         </div>
 
         <div class="page-header">
-          {% if jobsList %}
+          {% if not isSearchHit %}
+          <h3> No results match "{{jobDescription}}". </h3>
+          {% elif jobsList %}
           <div class="panel panel-primary">
             <div class="panel-heading">{{jobsList[0].title}}, {{jobsList[0].company}}</div>
             <div class="panel-body" style="max-height: 300px; overflow-y: scroll;">{{jobsList[0].html|safe}}</div>

@@ -166,20 +166,24 @@ class Jobs(object):
         # texts = [[w.lower() for w in word_tokenize(row[0]) if (w.isalpha() and (w not in self.STOPLIST))] for row in rows]
 
 
-        # remove words that appear only once
-        all_tokens = sum(texts, [])
-        tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
-        texts = [[self.stemmer.stem(word) for word in text if word not in tokens_once] for text in texts]
+        # remove words that appear only once -- this is really time consuming
+        # TODO: can we use hadoop for word counts? Can we remove these after converting to bow?
+        # all_tokens = sum(texts, [])
+        # tokens_once = set(word for word in set(all_tokens) if all_tokens.count(word) == 1)
+        # texts = [[self.stemmer.stem(word) for word in text if word not in tokens_once] for text in texts]
+        texts = [[self.stemmer.stem(word) for word in text] for text in texts]
 
-        # bigram = models.phrases.Phrases(texts)
-        # bigramTexts = list(bigram[texts])
+        # return texts
 
-        # return bigramTexts, bigram
+        bigram = models.phrases.Phrases(texts)
+        bigramTexts = list(bigram[texts])
 
-        return texts
+        return bigramTexts, bigram
+
+
                 
     def _prepare_corpus(self):
-        texts = self._import_text()
+        texts, _ = self._import_text()
         
         # Convert into BOW
         self._dictionary = corpora.Dictionary(texts)
