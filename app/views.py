@@ -19,7 +19,7 @@ def index():
     
     if session['jobDescription'] is None:
         jobsList = []
-        session['jobDescription'] = "data scientist"
+        session['jobDescription'] = "data science"
         sim_score_sorted = ""
         session['checked'] = "checked"
     else:
