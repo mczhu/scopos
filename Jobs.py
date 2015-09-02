@@ -151,21 +151,8 @@ class Jobs(object):
         with self._con:
             cur = self._con.cursor()
             cur.execute("SELECT `title`, `summary` FROM Jobs")
-            texts = []
-            for row in cur:
-                lowerText = []
-                for w in word_tokenize(row[0] + ' ' + row[1]):
-                    if (w.isalpha()):
-                        lowerW = w.lower()
-                        if (lowerW not in self.STOPLIST):
-                            lowerText.append(lowerW)
-                texts.append(lowerText)
-                
-        #     rows = cur.fetchall()
-        
-        # texts = [[w.lower() for w in word_tokenize(row[0]) if (w.isalpha() and (w not in self.STOPLIST))] for row in rows]
-
-
+            texts = [[w.lower() for w in word_tokenize(row[0] + ' ' + row[1]) if w.lower() not in self.STOPLIST] for row in cur]
+            
         # remove words that appear only once -- this is really time consuming
         # TODO: can we use hadoop for word counts? Can we remove these after converting to bow?
         # all_tokens = sum(texts, [])
@@ -270,7 +257,7 @@ class Jobs(object):
     def _getVecRep(self, jobDescription):
         if self._lsi is None or self._tfidf is None or self._simIndex is None or self._dictionary is None:        
             self._init_model()
-        text = [self.stemmer.stem(w.lower()) for w in word_tokenize(jobDescription) if (w.isalpha() and (w not in self.STOPLIST))]
+        text = [self.stemmer.stem(w.lower()) for w in word_tokenize(jobDescription) if (w not in self.STOPLIST)]
         vec_bow = self._dictionary.doc2bow(text)
         vec_tfidf = self._tfidf[vec_bow]
         vec_lsi = self._lsi[vec_tfidf]
