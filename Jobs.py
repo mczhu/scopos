@@ -160,17 +160,17 @@ class Jobs(object):
         # texts = [[self.stemmer.stem(word) for word in text if word not in tokens_once] for text in texts]
         texts = [[self.stemmer.stem(word) for word in text] for text in texts]
 
-        # return texts
+        return texts
 
-        bigram = models.phrases.Phrases(texts)
-        bigramTexts = list(bigram[texts])
+        # bigram = models.phrases.Phrases(texts)
+        # bigramTexts = list(bigram[texts])
 
-        return bigramTexts, bigram
+        # return bigramTexts, bigram
 
 
                 
     def _prepare_corpus(self):
-        texts, _ = self._import_text()
+        texts = self._import_text()
         
         # Convert into BOW
         self._dictionary = corpora.Dictionary(texts)

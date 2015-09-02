@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if isAddJobs:
         jobs.addToDB(indeedKey, mashapeKey, "data+scientist",  nJobs=200)
 
-    isInitModel = False
+    isInitModel = True
     if isInitModel:
         jobs._init_model(num_topics=50, isInitCorpus=True)
 
